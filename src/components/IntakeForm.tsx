@@ -10,6 +10,8 @@ import { Button, EyebrowLabel, FieldLabel } from "./ui";
 interface Props {
   initial: IntakeFormData;
   onSubmit: (form: IntakeFormData) => void;
+  /** Step back to the landing page. Whatever is typed here stays in the draft. */
+  onBack: () => void;
 }
 
 type Errors = Partial<Record<"clientCompany" | "synopsisText", string>>;
@@ -29,7 +31,7 @@ function withDefaultPreset(form: IntakeFormData): IntakeFormData {
   return form;
 }
 
-export function IntakeForm({ initial, onSubmit }: Props) {
+export function IntakeForm({ initial, onSubmit, onBack }: Props) {
   const [form, setForm] = useState<IntakeFormData>(() => withDefaultPreset(initial));
   const [errors, setErrors] = useState<Errors>({});
   const [clientMenuOpen, setClientMenuOpen] = useState(false);
@@ -434,7 +436,10 @@ export function IntakeForm({ initial, onSubmit }: Props) {
         </div>
       </div>
 
-      <div style={{ marginTop: "var(--space-8)", display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ marginTop: "var(--space-8)", display: "flex", justifyContent: "space-between", gap: "var(--space-4)", flexWrap: "wrap" }}>
+        <Button type="button" variant="ghost" onClick={onBack}>
+          ← Back
+        </Button>
         <Button type="submit" variant="primary">
           Generate story options →
         </Button>

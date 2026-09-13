@@ -16,6 +16,7 @@ interface Props {
   onRerunQa: () => void;
   onSetImagePromptStyle: (style: ImagePromptStyle) => void;
   onUpdateImagePrompt: (slideIndex: number, text: string) => void;
+  onBack: () => void;
 }
 
 const SEVERITY_ORDER: QaFlag["severity"][] = ["critical", "warning", "info"];
@@ -25,7 +26,15 @@ const SEVERITY_LABEL: Record<QaFlag["severity"], string> = {
   info: "Info",
 };
 
-export function ReviewExportStep({ deck, onEditOutlineItem, onRegenerateSlide, onRerunQa, onSetImagePromptStyle, onUpdateImagePrompt }: Props) {
+export function ReviewExportStep({
+  deck,
+  onEditOutlineItem,
+  onRegenerateSlide,
+  onRerunQa,
+  onSetImagePromptStyle,
+  onUpdateImagePrompt,
+  onBack,
+}: Props) {
   const [editingSlide, setEditingSlide] = useState<number | null>(null);
   const [qaOpen, setQaOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -331,6 +340,15 @@ export function ReviewExportStep({ deck, onEditOutlineItem, onRegenerateSlide, o
           Switching Abstract / Photographic here rewrites the prompts and updates the deck prompt above — copy the deck prompt again if you change
           it after pasting.
         </p>
+      </div>
+
+      <div style={{ marginTop: "var(--space-8)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: "var(--space-4)", flexWrap: "wrap" }}>
+        <Button variant="ghost" onClick={onBack}>
+          ← Back to Theming Agent
+        </Button>
+        <span className="field-hint" style={{ marginTop: 0 }}>
+          Going back keeps this draft — the deck prompt rebuilds from whatever you change.
+        </span>
       </div>
     </div>
   );

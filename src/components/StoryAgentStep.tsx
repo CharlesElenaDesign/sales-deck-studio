@@ -192,9 +192,6 @@ export function StoryAgentStep({ form, storyOptions, selectedStoryId, clientBran
           <Button variant="secondary" size="sm" onClick={() => setShowHintBox((v) => !v)}>
             Ask for a different direction
           </Button>
-          <Button variant="ghost" size="sm" onClick={onBackToForm}>
-            ← Return to initial form
-          </Button>
         </div>
         {showHintBox && (
           <div style={{ display: "flex", gap: "var(--space-3)" }}>
@@ -211,7 +208,10 @@ export function StoryAgentStep({ form, storyOptions, selectedStoryId, clientBran
         )}
       </div>
 
-      <div style={{ marginTop: "var(--space-8)", display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ marginTop: "var(--space-8)", display: "flex", justifyContent: "space-between", gap: "var(--space-4)", flexWrap: "wrap" }}>
+        <Button variant="ghost" onClick={onBackToForm}>
+          ← Back to the brief
+        </Button>
         <Button variant="primary" onClick={onContinue} disabled={!selectedStoryId}>
           Continue to Narrative Agent →
         </Button>

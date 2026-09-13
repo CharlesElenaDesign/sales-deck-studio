@@ -331,7 +331,7 @@ export default function Home() {
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "var(--space-10) var(--gutter) var(--space-24)" }}>
           {deck.step === "landing" && <LandingPage onStart={() => goToStep("intake")} />}
 
-          {deck.step === "intake" && <IntakeForm initial={deck.form} onSubmit={handleIntakeSubmit} />}
+          {deck.step === "intake" && <IntakeForm initial={deck.form} onSubmit={handleIntakeSubmit} onBack={() => goToStep("landing")} />}
 
           {deck.step === "story" && (
             <StoryAgentStep
@@ -387,6 +387,7 @@ export default function Home() {
               onRerunQa={() => setDeck((d) => ({ ...d, qaFlags: runQaChecks(d) }))}
               onSetImagePromptStyle={handleSetImagePromptStyle}
               onUpdateImagePrompt={handleUpdateImagePrompt}
+              onBack={() => goToStep("theming")}
             />
           )}
         </div>
