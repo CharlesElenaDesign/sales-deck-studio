@@ -1,4 +1,6 @@
 import { coverArtSpecText } from "./coverArt";
+import { findKnownClientById, matchKnownClient } from "./knownClients";
+import { absoluteAssetUrl, INFOSYS_LOGO, logoAssetForKnownClient } from "./knownClientLogos";
 import { DeckState, internalSlideCount } from "./types";
 
 function section(title: string, body: string): string {
@@ -51,6 +53,19 @@ export function buildDeckPrompt(deck: DeckState): string {
     .join("\n\n");
   const imageStyleLabel = deck.imagePromptStyle === "photographic" ? "editorial photography" : "abstract brand-motif graphics";
 
+  const known = findKnownClientById(form.knownClientId) ?? matchKnownClient(form.clientCompany);
+  const clientLogo = logoAssetForKnownClient(known?.id);
+  const isLocalhost = typeof window !== "undefined" && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+  const logoLines: string[] = [];
+  if (clientLogo) {
+    logoLines.push(`- ${client}'s official logo (SVG/PNG): ${clientLogo.source}${isLocalhost ? "" : ` — mirror: ${absoluteAssetUrl(clientLogo.path)}`}`);
+  } else if (form.clientLogoDataUrl) {
+    logoLines.push(`- ${client}'s logo: the presenter holds the file — if this platform accepts uploads, ask for it; otherwise search for the official logo.`);
+  }
+  if (INFOSYS_LOGO) {
+    logoLines.push(`- Infosys official logo (SVG): ${INFOSYS_LOGO.source}${isLocalhost ? "" : ` — mirror: ${absoluteAssetUrl(INFOSYS_LOGO.path)}`}`);
+  }
+
   const meta: string[] = [];
   if (form.presenterName) meta.push(`Presenter: ${form.presenterName}`);
   if (form.presenterDate) meta.push(`Date: ${form.presenterDate}`);
@@ -70,7 +85,7 @@ ${section(
 Retrieve and use the real official logos:
 - ${client}'s official logo.
 - Infosys's official logo.
-Use the real files as-is. Do not redraw, recolor, distort, or merge the two logos into a new combined mark.${form.clientLogoDataUrl ? ` (The presenter already holds ${client}'s official logo file — if this platform accepts file uploads, ask for it and use it directly instead of searching.)` : ""} If a logo genuinely can't be found or confidently verified after searching, fall back to a clean text wordmark rather than guessing or fabricating one.
+${logoLines.length ? `Direct links to the files (download and use these first; the presenter may also have attached the same files alongside this prompt):\n${logoLines.join("\n")}\n` : ""}Use the real files as-is. Do not redraw, recolor, distort, or merge the two logos into a new combined mark. If a logo genuinely can't be found or confidently verified after searching, fall back to a clean text wordmark rather than guessing or fabricating one.
 
 Co-branding lockup: ${client}'s logo first, then a thin neutral divider, then the Infosys logo — small and restrained, placed on the cover and closing slide only (not repeated on every internal slide). Infosys reads as a credible delivery-partner endorsement, not a co-owner of the page — ${client}'s own brand identity (colors, tone) should visually lead every slide, based on what you find from real search, not a guess. This single image-based lockup is the only co-branding mark on the slide — do not also add a separate text line spelling out "${client}" and "Infosys" (as an eyebrow, caption, or watermark) anywhere else on the same slide. One lockup, never two.
 

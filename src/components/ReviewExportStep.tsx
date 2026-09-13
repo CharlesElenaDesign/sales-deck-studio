@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { findKnownClientById, matchKnownClient } from "@/lib/knownClients";
+import { INFOSYS_LOGO, logoAssetForKnownClient } from "@/lib/knownClientLogos";
 import { buildDeckPrompt } from "@/lib/promptBuilder";
 import { DeckState, ImagePromptStyle, QaFlag, SlideOutlineItem } from "@/lib/types";
 import { ImagePromptsPanel } from "./ImagePromptsPanel";
@@ -47,6 +49,10 @@ export function ReviewExportStep({ deck, onEditOutlineItem, onRegenerateSlide, o
   const criticalCount = deck.qaFlags.filter((f) => f.severity === "critical").length;
   const warningCount = deck.qaFlags.filter((f) => f.severity === "warning").length;
   const infoCount = deck.qaFlags.filter((f) => f.severity === "info").length;
+
+  const knownClient = findKnownClientById(deck.form.knownClientId) ?? matchKnownClient(deck.form.clientCompany);
+  const clientLogo = logoAssetForKnownClient(knownClient?.id);
+  const uploadedLogo = !clientLogo && deck.form.clientLogoDataUrl ? deck.form.clientLogoDataUrl : undefined;
 
   const theme = deck.themeOptions.find((t) => t.id === deck.selectedThemeId);
   const internalCount = deck.outline.filter((o) => o.role === "internal").length;
@@ -257,6 +263,35 @@ export function ReviewExportStep({ deck, onEditOutlineItem, onRegenerateSlide, o
           style={{ minHeight: 260, fontFamily: "monospace", fontSize: 12.5, lineHeight: 1.6 }}
           onFocus={(e) => e.target.select()}
         />
+        {(clientLogo || uploadedLogo || INFOSYS_LOGO) && (
+          <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid var(--border-hairline)", display: "flex", alignItems: "center", gap: "var(--space-4)", flexWrap: "wrap" }}>
+            <div style={{ minWidth: 240, flex: 1 }}>
+              <p className="field-label" style={{ marginBottom: 2 }}>
+                Logo files to attach with the prompt
+              </p>
+              <p className="field-hint" style={{ marginTop: 0 }}>
+                If your AI platform accepts file uploads, drop these in together with the prompt. If not, the prompt already contains public
+                links it can fetch them from.
+              </p>
+            </div>
+            <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
+              {(clientLogo || uploadedLogo) && (
+                <a
+                  className="btn btn-secondary btn-sm"
+                  href={clientLogo ? clientLogo.path : uploadedLogo}
+                  download={clientLogo ? clientLogo.path.split("/").pop() : `${deck.form.clientCompany || "client"}-logo`}
+                >
+                  ↓ {deck.form.clientCompany || "Client"} logo
+                </a>
+              )}
+              {INFOSYS_LOGO && (
+                <a className="btn btn-secondary btn-sm" href={INFOSYS_LOGO.path} download={INFOSYS_LOGO.path.split("/").pop()}>
+                  ↓ Infosys logo
+                </a>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Step 2: images ────────────────────────────────────────────────────── */}

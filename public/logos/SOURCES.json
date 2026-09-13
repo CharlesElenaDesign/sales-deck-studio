@@ -262,5 +262,9 @@
  "vestas": {
   "file": "vestas.svg",
   "source": "https://commons.wikimedia.org/wiki/Special:FilePath/Vestas.svg"
+ },
+ "infosys": {
+  "file": "infosys.svg",
+  "source": "https://commons.wikimedia.org/wiki/Special:FilePath/Infosys%20logo.svg"
  }
 }
