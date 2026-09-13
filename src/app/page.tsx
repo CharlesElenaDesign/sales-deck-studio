@@ -31,6 +31,23 @@ import {
   internalSlideCount,
 } from "@/lib/types";
 
+const STATIC_EXPORT = process.env.NEXT_PUBLIC_STATIC_EXPORT === "true";
+
+/** On static hosting (GitHub Pages) there is no server to scan websites, so unknown clients get an honest placeholder. */
+function staticFallbackProfile(companyName: string): BrandProfile {
+  return {
+    companyName,
+    colors: [],
+    fonts: [],
+    sources: [],
+    confidence: "unavailable",
+    notes: [
+      "The live website colour scan is not available on this hosted version (static site). Clients on the built-in list still get their reference colours and logo; for others a neutral palette is used and the AI platform is told to research the brand itself.",
+    ],
+    fetchedAt: new Date().toISOString(),
+  };
+}
+
 export default function Home() {
   const [deck, setDeck] = useState<DeckState>(() => createInitialDeckState());
   const [hydrated, setHydrated] = useState(false);
@@ -60,6 +77,15 @@ export default function Home() {
 
   async function runBrandResearch(form: IntakeFormData) {
     const known = knownClientForForm(form);
+    if (STATIC_EXPORT) {
+      setDeck((d) => ({
+        ...d,
+        clientBrand: known ? brandProfileFromKnownClient(known) : staticFallbackProfile(form.clientCompany),
+        infosysBrand: d.infosysBrand ?? staticFallbackProfile("Infosys"),
+        brandResearchStatus: "done",
+      }));
+      return;
+    }
     // Curated clients get their reference colours immediately; live research then adds sources.
     setDeck((d) => ({ ...d, brandResearchStatus: "loading", clientBrand: known ? brandProfileFromKnownClient(known) : d.clientBrand }));
     try {
@@ -79,6 +105,7 @@ export default function Home() {
   }
 
   async function retryClientBrandResearch(url?: string) {
+    if (STATIC_EXPORT) return;
     setDeck((d) => ({ ...d, brandResearchStatus: "loading" }));
     try {
       const res = await fetch("/api/brand-research", {

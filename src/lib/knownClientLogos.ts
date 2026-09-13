@@ -81,12 +81,25 @@ export const KNOWN_CLIENT_LOGOS: Record<string, LogoAsset> = {
 
 export const INFOSYS_LOGO: LogoAsset | undefined = {"path": "/logos/infosys.svg", "source": "https://commons.wikimedia.org/wiki/Special:FilePath/Infosys%20logo.svg"};
 
+/** Prefix for app-served assets; "/sales-deck-studio" on GitHub Pages, "" everywhere else. */
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+function withBase(asset: LogoAsset): LogoAsset {
+  return asset.path.startsWith(BASE_PATH + "/logos") ? asset : { ...asset, path: `${BASE_PATH}${asset.path}` };
+}
+
 export function logoForKnownClient(id: string | undefined): string | undefined {
-  return id ? KNOWN_CLIENT_LOGOS[id]?.path : undefined;
+  const asset = id ? KNOWN_CLIENT_LOGOS[id] : undefined;
+  return asset ? withBase(asset).path : undefined;
 }
 
 export function logoAssetForKnownClient(id: string | undefined): LogoAsset | undefined {
-  return id ? KNOWN_CLIENT_LOGOS[id] : undefined;
+  const asset = id ? KNOWN_CLIENT_LOGOS[id] : undefined;
+  return asset ? withBase(asset) : undefined;
+}
+
+export function infosysLogoAsset(): LogoAsset | undefined {
+  return INFOSYS_LOGO ? withBase(INFOSYS_LOGO) : undefined;
 }
 
 /** Marker stored in clientLogoFileName when the logo came from the curated list rather than an upload. */

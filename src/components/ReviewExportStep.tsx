@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { findKnownClientById, matchKnownClient } from "@/lib/knownClients";
-import { INFOSYS_LOGO, logoAssetForKnownClient } from "@/lib/knownClientLogos";
+import { infosysLogoAsset, logoAssetForKnownClient } from "@/lib/knownClientLogos";
 import { buildDeckPrompt } from "@/lib/promptBuilder";
 import { DeckState, ImagePromptStyle, QaFlag, SlideOutlineItem } from "@/lib/types";
 import { ImagePromptsPanel } from "./ImagePromptsPanel";
@@ -53,6 +53,7 @@ export function ReviewExportStep({ deck, onEditOutlineItem, onRegenerateSlide, o
   const knownClient = findKnownClientById(deck.form.knownClientId) ?? matchKnownClient(deck.form.clientCompany);
   const clientLogo = logoAssetForKnownClient(knownClient?.id);
   const uploadedLogo = !clientLogo && deck.form.clientLogoDataUrl ? deck.form.clientLogoDataUrl : undefined;
+  const infosysLogo = infosysLogoAsset();
 
   const theme = deck.themeOptions.find((t) => t.id === deck.selectedThemeId);
   const internalCount = deck.outline.filter((o) => o.role === "internal").length;
@@ -263,7 +264,7 @@ export function ReviewExportStep({ deck, onEditOutlineItem, onRegenerateSlide, o
           style={{ minHeight: 260, fontFamily: "monospace", fontSize: 12.5, lineHeight: 1.6 }}
           onFocus={(e) => e.target.select()}
         />
-        {(clientLogo || uploadedLogo || INFOSYS_LOGO) && (
+        {(clientLogo || uploadedLogo || infosysLogo) && (
           <div style={{ marginTop: "var(--space-4)", paddingTop: "var(--space-4)", borderTop: "1px solid var(--border-hairline)", display: "flex", alignItems: "center", gap: "var(--space-4)", flexWrap: "wrap" }}>
             <div style={{ minWidth: 240, flex: 1 }}>
               <p className="field-label" style={{ marginBottom: 2 }}>
@@ -284,8 +285,8 @@ export function ReviewExportStep({ deck, onEditOutlineItem, onRegenerateSlide, o
                   ↓ {deck.form.clientCompany || "Client"} logo
                 </a>
               )}
-              {INFOSYS_LOGO && (
-                <a className="btn btn-secondary btn-sm" href={INFOSYS_LOGO.path} download={INFOSYS_LOGO.path.split("/").pop()}>
+              {infosysLogo && (
+                <a className="btn btn-secondary btn-sm" href={infosysLogo.path} download={infosysLogo.path.split("/").pop()}>
                   ↓ Infosys logo
                 </a>
               )}

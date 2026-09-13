@@ -1,6 +1,6 @@
 import { coverArtSpecText } from "./coverArt";
 import { findKnownClientById, matchKnownClient } from "./knownClients";
-import { absoluteAssetUrl, INFOSYS_LOGO, logoAssetForKnownClient } from "./knownClientLogos";
+import { absoluteAssetUrl, infosysLogoAsset, logoAssetForKnownClient } from "./knownClientLogos";
 import { DeckState, internalSlideCount } from "./types";
 
 function section(title: string, body: string): string {
@@ -62,8 +62,9 @@ export function buildDeckPrompt(deck: DeckState): string {
   } else if (form.clientLogoDataUrl) {
     logoLines.push(`- ${client}'s logo: the presenter holds the file — if this platform accepts uploads, ask for it; otherwise search for the official logo.`);
   }
-  if (INFOSYS_LOGO) {
-    logoLines.push(`- Infosys official logo (SVG): ${INFOSYS_LOGO.source}${isLocalhost ? "" : ` — mirror: ${absoluteAssetUrl(INFOSYS_LOGO.path)}`}`);
+  const infosysLogo = infosysLogoAsset();
+  if (infosysLogo) {
+    logoLines.push(`- Infosys official logo (SVG): ${infosysLogo.source}${isLocalhost ? "" : ` — mirror: ${absoluteAssetUrl(infosysLogo.path)}`}`);
   }
 
   const meta: string[] = [];
